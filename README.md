@@ -665,10 +665,6 @@ running
 
 The Lambda then applies the predefined tags.
 
-### Screenshot
-
-**Screenshot required:** No
-
 ---
 
 # Step 6 – Create EventBridge Rule
@@ -865,21 +861,14 @@ auto-tag-ec2-instance
 
 ---
 
-## Screenshot
-
-**Screenshot required:** Yes
-
-Capture the EventBridge target showing:
+EventBridge target:
 
 ```text
 Lambda function:
 auto-tag-ec2-instance
 ```
+<img width="1919" height="850" alt="image" src="https://github.com/user-attachments/assets/20b29765-db6c-4721-a562-35ffe597899c" />
 
-Save as:
-
-```text
-screenshots/06-eventbridge-target.png
 ```
 
 ---
@@ -936,12 +925,6 @@ Verify the target:
 auto-tag-ec2-instance
 ```
 
-### Screenshot
-
-**Screenshot required:** No
-
-The target screenshot from Step 8 provides the required evidence.
-
 ---
 
 # Step 10 – Verify Lambda Invocation Permission
@@ -976,9 +959,6 @@ The permission should be associated with the EventBridge rule:
 ec2-auto-tagging-rule
 ```
 
-### Screenshot
-
-**Screenshot required:** No
 
 ---
 
@@ -1077,27 +1057,13 @@ The EventBridge rule is specifically looking for:
 ```text
 running
 ```
+<img width="1919" height="852" alt="image" src="https://github.com/user-attachments/assets/21b37c3a-50d1-4953-9e1a-aed457c431e0" />
 
 ---
 
-## Screenshot
-
-**Screenshot required:** Yes
-
-Capture the EC2 instance showing:
-
-```text
-Instance state:
-Running
+```
 ```
 
-Save as:
-
-```text
-screenshots/07-ec2-running.png
-```
-
----
 
 # Step 12 – Verify EventBridge Trigger
 
@@ -1117,11 +1083,6 @@ ec2-auto-tagging-rule
 auto-tag-ec2-instance
 ```
 
-No manual Lambda invocation is required for this test.
-
-### Screenshot
-
-**Screenshot required:** No
 
 ---
 
@@ -1194,18 +1155,6 @@ Tag response: {...}
 ```
 
 ---
-
-## Screenshot
-
-**Screenshot required:** Yes
-
-Capture the successful Lambda execution in CloudWatch Logs.
-
-Save as:
-
-```text
-screenshots/08-lambda-execution.png
-```
 
 ---
 
@@ -1433,180 +1382,6 @@ Project = EC2-AutoTagging
 
 ---
 
-# Troubleshooting
-
-## 1. Lambda Does Not Receive the EC2 Event
-
-Check:
-
-* EventBridge rule is enabled.
-* EventBridge rule is attached to the default event bus.
-* EventBridge event pattern is correct.
-* Lambda is configured as the target.
-* EventBridge has permission to invoke Lambda.
-* EC2 instance actually changed state.
-* EC2 instance changed into the `running` state.
-* Lambda and EventBridge are in the same AWS Region.
-
----
-
-## 2. Lambda Returns AccessDenied
-
-If CloudWatch shows:
-
-```text
-AccessDeniedException
-```
-
-or:
-
-```text
-not authorized to perform: ec2:CreateTags
-```
-
-go to:
-
-```text
-IAM
-    ↓
-Roles
-    ↓
-ec2-auto-tag-lambda-role
-    ↓
-Permissions
-```
-
-Verify:
-
-```text
-EC2AutoTaggingPolicy
-```
-
-contains:
-
-```text
-ec2:CreateTags
-ec2:DescribeInstances
-```
-
----
-
-## 3. Lambda Cannot Describe EC2 Instance
-
-If an error indicates that the Lambda cannot perform:
-
-```text
-ec2:DescribeInstances
-```
-
-verify the IAM policy contains:
-
-```json
-{
-  "Effect": "Allow",
-  "Action": [
-    "ec2:DescribeInstances"
-  ],
-  "Resource": "*"
-}
-```
-
----
-
-## 4. EventBridge Rule Does Not Trigger
-
-Verify the event pattern exactly:
-
-```json
-{
-  "source": [
-    "aws.ec2"
-  ],
-  "detail-type": [
-    "EC2 Instance State-change Notification"
-  ],
-  "detail": {
-    "state": [
-      "running"
-    ]
-  }
-}
-```
-
-Make sure the EC2 instance changed into the `running` state after the EventBridge rule was created and enabled.
-
----
-
-## 5. EC2 Tags Do Not Appear
-
-Open:
-
-```text
-Lambda
-    ↓
-auto-tag-ec2-instance
-    ↓
-Monitor
-    ↓
-View CloudWatch logs
-```
-
-Check for:
-
-```text
-AccessDenied
-InvalidInstanceID
-```
-
-or other EC2 API errors.
-
-Verify that the event contains:
-
-```json
-{
-  "detail": {
-    "instance-id": "i-xxxxxxxxxxxxxxxxx",
-    "state": "running"
-  }
-}
-```
-
----
-
-## 6. Instance Was Already Running
-
-If the EC2 instance was already running before the EventBridge rule was created, the rule will not automatically receive a new `running` event.
-
-For a clean test:
-
-```text
-Stop EC2
-    ↓
-Wait until stopped
-    ↓
-Start EC2
-    ↓
-Wait until running
-    ↓
-Check EventBridge
-    ↓
-Check Lambda
-    ↓
-Check EC2 tags
-```
-
----
-
-## 7. Lambda Code Was Changed but Not Deployed
-
-After changing Lambda code, click:
-
-```text
-Deploy
-```
-
-
-
 ```
 
 ---
@@ -1628,50 +1403,7 @@ assignment-05-ec2-auto-tagging/
 
 ---
 
-# Final Verification Checklist
 
-Before marking Assignment 5 complete:
-
-* [ ] AWS account configured.
-* [ ] AWS Region selected.
-* [ ] Local project directory created.
-* [ ] `lambda_function.py` created.
-* [ ] `README.md` created.
-* [ ] `screenshots` directory created.
-* [ ] IAM role created.
-* [ ] Lambda trusted entity configured.
-* [ ] `AWSLambdaBasicExecutionRole` attached.
-* [ ] `EC2AutoTaggingPolicy` created.
-* [ ] `ec2:CreateTags` permission configured.
-* [ ] `ec2:DescribeInstances` permission configured.
-* [ ] Lambda function created.
-* [ ] Lambda uses `ec2-auto-tag-lambda-role`.
-* [ ] Lambda code added.
-* [ ] Lambda code deployed.
-* [ ] EventBridge rule created.
-* [ ] EventBridge default event bus selected.
-* [ ] EventBridge event pattern configured.
-* [ ] EventBridge configured to detect `running`.
-* [ ] Lambda configured as EventBridge target.
-* [ ] EventBridge rule enabled.
-* [ ] Lambda invocation permission verified.
-* [ ] EC2 test instance selected.
-* [ ] EC2 instance changed to `running`.
-* [ ] EventBridge received the event.
-* [ ] Lambda executed successfully.
-* [ ] Lambda received the correct instance ID.
-* [ ] Lambda called `CreateTags`.
-* [ ] EC2 tags created automatically.
-* [ ] CloudWatch logs verified.
-* [ ] Required screenshots captured.
-* [ ] README completed.
-* [ ] Git repository initialized.
-* [ ] Git commit created.
-* [ ] GitHub repository created.
-* [ ] GitHub remote configured.
-* [ ] Project pushed to GitHub.
-
----
 
 # Conclusion
 
