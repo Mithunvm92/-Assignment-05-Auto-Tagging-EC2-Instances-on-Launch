@@ -1455,5 +1455,3 @@ EC2 Instance
 
 This completes the EC2 automatic tagging automation using AWS Lambda, EventBridge, IAM, CloudWatch Logs, Python, and Boto3.
 
-```
-```
